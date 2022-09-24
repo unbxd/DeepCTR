@@ -171,11 +171,14 @@ class DNN(Layer):
 
         self.dropout_layers = [tf.keras.layers.Dropout(self.dropout_rate, seed=self.seed + i) for i in
                                range(len(self.hidden_units))]
-
-        self.activation_layers = [activation_layer(self.activation) for _ in range(len(self.hidden_units))]
+        self.activation_layers={}
+        for i in range(len (self.hidden_units)):
+            self.activation_layers[str(i)]=activation_layer(self.activation)
+        #self.activation_layers = [activation_layer(self.activation) for _ in range(len(self.hidden_units))]
 
         if self.output_activation:
-            self.activation_layers[-1] = activation_layer(self.output_activation)
+            self.activation_layers[str(len(self.hidden_units)-1)] = activation_layer(self.output_activation)
+            #self.activation_layers[-1] = activation_layer(self.output_activation)
 
         super(DNN, self).build(input_shape)  # Be sure to call this somewhere!
 
@@ -190,7 +193,7 @@ class DNN(Layer):
             if self.use_bn:
                 fc = self.bn_layers[i](fc, training=training)
 
-            fc = self.activation_layers[i](fc)
+            fc = self.activation_layers[str(i)](fc)
 
             fc = self.dropout_layers[i](fc, training=training)
             deep_input = fc
